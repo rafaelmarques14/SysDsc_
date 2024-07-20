@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+   <title>Login</title>
+   <style>
+      body {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         height: 100vh;
+         margin: 0;
+      }
+      .login-panel {
+         width: 300px;
+      }
+   </style>
+</h:head>
+<h:body>
+   <h:form>
+      <p:panel header="Login" styleClass="login-panel">
+         <h:panelGrid columns="2">
+            <h:outputLabel for="emailLogin" value="Email: " />
+            <p:inputText id="emailLogin" value="#{usuarioBean.emailLogin}" required="true" />
+
+            <h:outputLabel for="senhaLogin" value="Senha: " />
+            <p:password id="senhaLogin" value="#{usuarioBean.senhaLogin}" required="true" />
+
+            <h:outputLabel />
+            <p:commandButton value="Login" action="#{usuarioBean.login()}" update="@form" />
+         </h:panelGrid>
+      </p:panel>
+   </h:form>
+</h:body>
+</html>
