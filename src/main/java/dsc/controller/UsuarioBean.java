@@ -59,7 +59,7 @@ public class UsuarioBean implements Serializable {
         } else {
             loggedIn = false;
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou", "Usuário ou senha inválidos."));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou:", "Usuário ou senha inválidos."));
             return null; // Retorna null para permanecer na página de login
         }
     }
