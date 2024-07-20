@@ -20,6 +20,7 @@
 <h:body>
    <h:form>
       <p:panel header="Login" styleClass="login-panel">
+         <h:messages id="messages" showDetail="true" autoUpdate="true" />
          <h:panelGrid columns="2">
             <h:outputLabel for="emailLogin" value="Email: " />
             <p:inputText id="emailLogin" value="#{usuarioBean.emailLogin}" required="true" />

@@ -2,7 +2,10 @@ package dsc.controller;
 
 import dsc.model.Usuario;
 import jakarta.ejb.Stateless;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,8 @@ public class UsuarioBean implements Serializable {
             return "home?faces-redirect=true"; // Redireciona para a página inicial após login bem-sucedido
         } else {
             loggedIn = false;
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou", "Usuário ou senha inválidos."));
             return null; // Retorna null para permanecer na página de login
         }
     }
