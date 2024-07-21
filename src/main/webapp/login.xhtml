@@ -18,7 +18,7 @@
    </style>
 </h:head>
 <h:body>
-   <h:form>
+   <h:form id="loginForm">
       <p:panel header="Login" styleClass="login-panel">
          <p:messages id="messages" showDetail="true" autoUpdate="true" />
          <h:panelGrid columns="2">
@@ -29,7 +29,7 @@
             <p:password id="senhaLogin" value="#{usuarioBean.senhaLogin}" required="true" requiredMessage="Digite a senha." />
 
             <h:outputLabel />
-            <p:commandButton value="Login" action="#{usuarioBean.login()}" icon="pi pi-sign-in" update="@form" />
+            <p:commandButton value="Login" action="#{usuarioBean.login()}" icon="pi pi-sign-in" update="messages" />
 
             <h:outputLabel />
             <h:panelGroup>
@@ -55,7 +55,7 @@
             <p:password id="senha" value="#{usuarioBean.usuario.senha}" required="true" requiredMessage="Digite a senha." />
 
             <h:outputLabel />
-            <p:commandButton value="Cadastrar" action="#{usuarioBean.cadastrarUsuario()}" update="cadastroForm" oncomplete="if (!args.validationFailed) PF('dlgCadastro').hide();" />
+            <p:commandButton value="Cadastrar" action="#{usuarioBean.cadastrarUsuario()}" update="cadastroMessages" oncomplete="if (!args.validationFailed) PF('dlgCadastro').hide();" />
          </h:panelGrid>
       </h:form>
    </p:dialog>

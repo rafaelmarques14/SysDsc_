@@ -1,17 +1,88 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
 <h:head>
    <title>Home</title>
 </h:head>
 <h:body>
-   <h:form>
-      <p:panel header="Bem-vindo!">
-         <h:outputText value="Login realizado com sucesso!" />
-         <br/>
-         <p:commandButton value="Logout" action="#{usuarioBean.logout()}" />
-      </p:panel>
-   </h:form>
+   <div class="card">
+      <h:form id="menuForm">
+         <p:growl id="messages"/>
+
+         <p:menubar hideDelay="1000">
+            <f:facet name="start">
+               <p:graphicImage name="images/primefaces-logo.svg" library="showcase" />
+            </f:facet>
+
+            <p:submenu label="Users" icon="pi pi-fw pi-user">
+               <p:menuitem value="Remover" icon="pi pi-fw pi-user-minus" onclick="PF('dlgRemover').show();" type="button"/>
+               <p:menuitem value="Atualizar" icon="pi pi-fw pi-user-edit" onclick="PF('dlgAtualizar').show();" type="button"/>
+               <p:menuitem value="Buscar" icon="pi pi-fw pi-search" onclick="PF('dlgBuscar').show();" type="button"/>
+            </p:submenu>
+
+            <p:divider layout="vertical"/>
+
+            <p:menuitem value="Logout" action="#{usuarioBean.logout()}" icon="pi pi-sign-out"/>
+         </p:menubar>
+      </h:form>
+   </div>
+
+   <!-- Modal de Remover Usuário -->
+   <p:dialog header="Remover Usuário" widgetVar="dlgRemover" modal="true" closable="true" resizable="false">
+      <h:form id="removerForm">
+         <p:messages id="removerMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="emailRemover" value="Email: " />
+            <p:inputText id="emailRemover" value="#{usuarioBean.emailLogin}" required="true" requiredMessage="Digite o email." />
+
+            <h:outputLabel />
+            <p:commandButton value="Remover" action="#{usuarioBean.removerUsuario()}" update="removerMessages" oncomplete="if (!args.validationFailed) PF('dlgRemover').hide();" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
+   <!-- Modal de Atualizar Usuário -->
+   <p:dialog header="Atualizar Usuário" widgetVar="dlgAtualizar" modal="true" closable="true" resizable="false"
+             onShow="PF('atualizarForm').reset(); PF('dlgAtualizar').load();"
+             onLoad="PF('dlgAtualizar').load();">
+      <h:form id="atualizarForm">
+         <p:messages id="atualizarMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="emailAtualizar" value="Email: " />
+            <p:inputText id="emailAtualizar" value="#{usuarioBean.usuario.email}" required="true" requiredMessage="Digite o email." disabled="true" />
+
+            <h:outputLabel for="nomeAtualizar" value="Nome: " />
+            <p:inputText id="nomeAtualizar" value="#{usuarioBean.usuario.nome}" required="true" requiredMessage="Digite o nome." />
+
+            <h:outputLabel for="senhaAtualizar" value="Senha: " />
+            <p:password id="senhaAtualizar" value="#{usuarioBean.usuario.senha}" required="true" requiredMessage="Digite a senha." />
+
+            <h:outputLabel />
+            <p:commandButton value="Atualizar" action="#{usuarioBean.atualizarUsuario()}" update="atualizarForm" oncomplete="if (!args.validationFailed) PF('dlgAtualizar').hide();" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
+   <!-- Modal de Buscar Usuário -->
+   <p:dialog header="Buscar Usuário" widgetVar="dlgBuscar" modal="true" closable="true" resizable="false">
+      <h:form id="buscarForm">
+         <p:messages id="buscarMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="emailBuscar" value="Email: " />
+            <p:inputText id="emailBuscar" value="#{usuarioBean.emailLogin}" required="true" requiredMessage="Digite o email." />
+
+            <h:outputLabel />
+            <p:commandButton value="Buscar" action="#{usuarioBean.buscarUsuario()}" update="buscarForm" />
+         </h:panelGrid>
+
+         <h:panelGrid columns="2" cellpadding="5">
+            <h:outputLabel value="Nome: " />
+            <h:outputText value="#{usuarioBean.usuario.nome}" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
 </h:body>
 </html>

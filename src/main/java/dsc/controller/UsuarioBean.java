@@ -30,8 +30,11 @@ public class UsuarioBean implements Serializable {
     }
 
     // Remoção de usuário
-    public void removerUsuario(String email) {
-        usuarios.removeIf(u -> u.getEmail().equals(email));
+    public void removerUsuario() {
+        if (emailLogin != null && !emailLogin.isEmpty()) {
+            usuarios.removeIf(u -> u.getEmail().equals(emailLogin));
+            emailLogin = null; // Limpa o campo após remoção
+        }
     }
 
     // Atualização de usuário
@@ -39,6 +42,8 @@ public class UsuarioBean implements Serializable {
         for (int i = 0; i < usuarios.size(); i++) {
             if (usuarios.get(i).getEmail().equals(usuario.getEmail())) {
                 usuarios.set(i, usuario);
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário atualizado com sucesso."));
                 break;
             }
         }
@@ -46,13 +51,41 @@ public class UsuarioBean implements Serializable {
     }
 
     // Busca de usuário
-    public Usuario buscarUsuario(String email) {
-        return usuarios.stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+    public void buscarUsuario() {
+        Usuario foundUser = usuarios.stream()
+                .filter(u -> u.getEmail().equals(emailLogin))
+                .findFirst()
+                .orElse(null);
+        if (foundUser != null) {
+            usuario = foundUser;
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuário não encontrado", "Nenhum usuário encontrado com este e-mail."));
+        }
+    }
+
+    // Carregar dados do usuário para atualização
+    public void carregarUsuarioParaAtualizar() {
+        Usuario foundUser = buscarUsuarioPeloEmail(emailLogin);
+        if (foundUser != null) {
+            usuario = foundUser;
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Usuário não encontrado para atualização."));
+        }
+    }
+
+    // Método auxiliar para buscar usuário pelo email
+    private Usuario buscarUsuarioPeloEmail(String email) {
+        return usuarios.stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
     }
 
     // Login de usuário
     public String login() {
-        Usuario usuario = buscarUsuario(emailLogin);
+        Usuario usuario = buscarUsuarioPeloEmail(emailLogin);
         if (usuario != null && usuario.getSenha().equals(senhaLogin)) {
             loggedIn = true;
             return "home?faces-redirect=true"; // Redireciona para a página inicial após login bem-sucedido
