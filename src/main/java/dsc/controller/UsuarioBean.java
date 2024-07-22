@@ -6,6 +6,7 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +31,19 @@ public class UsuarioBean implements Serializable {
     }
 
     // Remoção de usuário
+    // Remoção de usuário
     public void removerUsuario() {
         if (emailLogin != null && !emailLogin.isEmpty()) {
             usuarios.removeIf(u -> u.getEmail().equals(emailLogin));
             emailLogin = null; // Limpa o campo após remoção
+            loggedIn = false; // Desloga o usuário após a remoção
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário removido com sucesso. Você será deslogado."));
+            try {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("login.xhtml"); // Redireciona para a página de login
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

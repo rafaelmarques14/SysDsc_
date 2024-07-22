@@ -9,7 +9,7 @@
 <h:body>
    <div class="card">
       <h:form id="menuForm">
-         <p:growl id="messages"/>
+         <p:growl id="messages" autoUpdate="true"/>
 
          <p:menubar hideDelay="1000">
             <f:facet name="start">
@@ -38,10 +38,18 @@
             <p:inputText id="emailRemover" value="#{usuarioBean.emailLogin}" required="true" requiredMessage="Digite o email." />
 
             <h:outputLabel />
-            <p:commandButton value="Remover" action="#{usuarioBean.removerUsuario()}" update="removerMessages" oncomplete="if (!args.validationFailed) PF('dlgRemover').hide();" />
+            <p:commandButton value="Remover" onclick="PF('confirmDialog').show();" type="button"/>
          </h:panelGrid>
       </h:form>
    </p:dialog>
+
+   <!-- Diálogo de Confirmação -->
+   <p:confirmDialog header="Confirmação" message="Tem certeza que deseja remover o usuário?" showEffect="fade" hideEffect="fade" widgetVar="confirmDialog">
+      <h:form>
+         <p:commandButton value="Sim" action="#{usuarioBean.removerUsuario()}" update=":menuForm:messages, :removerForm:removerMessages" oncomplete="PF('confirmDialog').hide(); PF('dlgRemover').hide();"/>
+         <p:commandButton value="Não" onclick="PF('confirmDialog').hide();" type="button"/>
+      </h:form>
+   </p:confirmDialog>
 
    <!-- Modal de Atualizar Usuário -->
    <p:dialog header="Atualizar Usuário" widgetVar="dlgAtualizar" modal="true" closable="true" resizable="false"
@@ -60,7 +68,7 @@
             <p:password id="senhaAtualizar" value="#{usuarioBean.usuario.senha}" required="true" requiredMessage="Digite a senha." />
 
             <h:outputLabel />
-            <p:commandButton value="Atualizar" action="#{usuarioBean.atualizarUsuario()}" update="atualizarForm" oncomplete="if (!args.validationFailed) PF('dlgAtualizar').hide();" />
+            <p:commandButton value="Atualizar" action="#{usuarioBean.atualizarUsuario()}" update=":menuForm:messages, :atualizarForm:atualizarMessages" oncomplete="PF('dlgAtualizar').hide();"/>
          </h:panelGrid>
       </h:form>
    </p:dialog>
@@ -83,6 +91,5 @@
          </h:panelGrid>
       </h:form>
    </p:dialog>
-
 </h:body>
 </html>
