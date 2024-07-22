@@ -5,4 +5,7 @@
   <!-- Ensure metadata-complete is not set to true -->
   <display-name>SysDsc_</display-name>
   <!-- Other configurations -->
+  <welcome-file-list>
+    <welcome-file>login.xhtml</welcome-file>
+  </welcome-file-list>
 </web-app>
