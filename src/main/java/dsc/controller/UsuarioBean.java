@@ -69,6 +69,7 @@ public class UsuarioBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuário não encontrado", "Nenhum usuário encontrado com este e-mail."));
         }
+
     }
 
     // Preparar a busca

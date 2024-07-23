@@ -8,7 +8,7 @@
    <style>
       .button-container {
          display: flex;
-         gap: 2px; /* Espaço entre os botões */
+         gap: 10px; /* Espaço entre os botões */
       }
    </style>
 </h:head>
@@ -26,7 +26,7 @@
             </p:submenu>
 
             <p:submenu label="Evento" icon="pi pi-fw pi-calendar">
-               <p:menuitem value="Cadastrar" icon="pi pi-fw pi-plus" onclick="PF('dlgCadastrarEvento').show();" type="button"/>
+               <p:menuitem value="Cadastrar" icon="pi pi-fw pi-plus" onclick="PF('dlgCadastrarEvento').show(); #{eventoBean.prepararCadastro()}" type="button"/>
                <p:menuitem value="Buscar" icon="pi pi-fw pi-search" onclick="PF('dlgBuscarEvento').show();" type="button"/>
             </p:submenu>
 
@@ -99,7 +99,7 @@
       </h:form>
    </p:dialog>
 
-   <!-- Diálogo de Cadastrar Evento -->
+   <!-- Modal de Cadastrar Evento -->
    <p:dialog header="Cadastrar Evento" widgetVar="dlgCadastrarEvento" modal="true" closable="true" resizable="false">
       <h:form id="cadastrarEventoForm">
          <p:messages id="cadastrarEventoMessages" showDetail="true" autoUpdate="true" />
@@ -108,30 +108,16 @@
             <p:inputText id="nomeEventoCadastrar" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
 
             <h:outputLabel for="dataEventoCadastrar" value="Data: " />
-            <p:calendar id="dataEventoCadastrar" value="#{eventoBean.evento.data}" required="true" requiredMessage="Digite a data do evento." />
+            <p:calendar id="dataEventoCadastrar" value="#{eventoBean.evento.data}"  required="true" requiredMessage="Digite a data do evento." />
 
             <h:outputLabel />
-            <p:commandButton value="Cadastrar" action="#{eventoBean.cadastrarEvento()}" update=":menuForm:messages, :cadastrarEventoForm:cadastrarEventoMessages, :eventosForm:eventosPanel" oncomplete="PF('dlgCadastrarEvento').hide();" />
-         </h:panelGrid>
-      </h:form>
-   </p:dialog>
-
-   <!-- Diálogo de Remover Evento -->
-   <p:dialog header="Remover Evento" widgetVar="dlgRemoverEvento" modal="true" closable="true" resizable="false">
-      <h:form id="removerEventoForm">
-         <p:messages id="removerEventoMessages" showDetail="true" autoUpdate="true" />
-         <h:panelGrid columns="2">
-            <h:outputLabel for="nomeEventoRemover" value="Nome: " />
-            <p:inputText id="nomeEventoRemover" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
-
-            <h:outputLabel />
-            <p:commandButton value="Remover" action="#{eventoBean.removerEvento()}" update=":menuForm:messages, :removerEventoForm:removerEventoMessages" oncomplete="PF('dlgRemoverEvento').hide();" />
+            <p:commandButton value="Cadastrar" action="#{eventoBean.cadastrarEvento()}" update="cadastrarEventoMessages, eventosForm:eventosPanel" oncomplete="if (!args.validationFailed) PF('dlgCadastrarEvento').hide();" />
          </h:panelGrid>
       </h:form>
    </p:dialog>
 
    <!-- Diálogo de Atualizar Evento -->
-   <p:dialog header="Atualizar Evento" widgetVar="dlgAtualizarEvento" modal="true" closable="true" resizable="false">
+    <p:dialog header="Atualizar Evento" widgetVar="dlgAtualizarEvento" modal="true" closable="true" resizable="false">
       <h:form id="atualizarEventoForm">
          <p:messages id="atualizarEventoMessages" showDetail="true" autoUpdate="true" />
          <h:panelGrid columns="2">
@@ -142,13 +128,13 @@
             <p:calendar id="dataEventoAtualizar" value="#{eventoBean.evento.data}" required="true" requiredMessage="Digite a data do evento." />
 
             <h:outputLabel />
-            <p:commandButton value="Atualizar" action="#{eventoBean.atualizarEvento()}" update=":menuForm:messages, :atualizarEventoForm:atualizarEventoMessages" oncomplete="PF('dlgAtualizarEvento').hide();" />
+            <p:commandButton value="Atualizar" action="#{eventoBean.atualizarEvento()}" update=":menuForm:messages, :eventosForm:eventosPanel" oncomplete="PF('dlgAtualizarEvento').hide();" />
          </h:panelGrid>
       </h:form>
    </p:dialog>
 
-   <!-- Diálogo de Buscar Evento -->
-   <p:dialog header="Buscar Evento" widgetVar="dlgBuscarEvento" modal="true" closable="true" resizable="false">
+   <!-- Modal de Buscar Evento -->
+   <p:dialog header="Buscar Evento" widgetVar="dlgBuscarEvento" modal="true" closable="true" resizable="false" onHide="window.location.reload();">
       <h:form id="buscarEventoForm">
          <p:messages id="buscarEventoMessages" showDetail="true" autoUpdate="true" />
          <h:panelGrid columns="2">
@@ -156,7 +142,15 @@
             <p:inputText id="nomeEventoBuscar" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
 
             <h:outputLabel />
-            <p:commandButton value="Buscar" action="#{eventoBean.buscarEvento()}" update=":menuForm:messages, :buscarEventoForm:buscarEventoMessages, :eventosForm:eventosPanel" oncomplete="PF('dlgBuscarEvento').hide();" />
+            <p:commandButton value="Buscar" action="#{eventoBean.buscarEvento()}" update="@form" oncomplete="PF('dlgBuscarEvento').show();" />
+         </h:panelGrid>
+
+         <h:panelGrid id="eventoPanel" columns="2" cellpadding="5">
+            <h:outputLabel value="Nome: " />
+            <h:outputText value="#{eventoBean.evento.nome}" />
+
+            <h:outputLabel value="Data: " />
+            <h:outputText value="#{eventoBean.formatarData(e.data)}" />
          </h:panelGrid>
       </h:form>
    </p:dialog>
@@ -168,11 +162,11 @@
             <h:outputText value="#{e.nome}" />
          </p:column>
          <p:column headerText="Data">
-            <h:outputText value="#{e.data}" />
+            <h:outputText value="#{eventoBean.formatarData(e.data)}" />
          </p:column>
          <p:column>
             <p:commandButton value="Atualizar" icon="pi pi-pencil" actionListener="#{eventoBean.prepararAtualizacao(e)}" update=":menuForm:messages, :atualizarEventoForm" oncomplete="PF('dlgAtualizarEvento').show();" />
-            <p:commandButton value="Remover" icon="pi pi-minus" actionListener="#{eventoBean.prepararRemocao(e)}" update=":menuForm:messages, :removerEventoForm" oncomplete="PF('dlgRemoverEvento').show();" />
+            <p:commandButton value="Remover" icon="pi pi-minus" actionListener="#{eventoBean.removerEvento(e)}" update=":menuForm:messages, :eventosForm:eventosPanel" />
          </p:column>
       </p:dataTable>
    </h:form>
