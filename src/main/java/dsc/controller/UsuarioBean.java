@@ -31,7 +31,6 @@ public class UsuarioBean implements Serializable {
     }
 
     // Remoção de usuário
-    // Remoção de usuário
     public void removerUsuario() {
         if (emailLogin != null && !emailLogin.isEmpty()) {
             usuarios.removeIf(u -> u.getEmail().equals(emailLogin));
@@ -53,7 +52,7 @@ public class UsuarioBean implements Serializable {
             if (usuarios.get(i).getEmail().equals(usuario.getEmail())) {
                 usuarios.set(i, usuario);
                 FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Usuário atualizado com sucesso."));
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso: Usuário atualizado com sucesso.", "Usuário atualizado com sucesso."));
                 break;
             }
         }
@@ -62,16 +61,21 @@ public class UsuarioBean implements Serializable {
 
     // Busca de usuário
     public void buscarUsuario() {
-        Usuario foundUser = usuarios.stream()
-                .filter(u -> u.getEmail().equals(emailLogin))
-                .findFirst()
-                .orElse(null);
+        Usuario foundUser = buscarUsuarioPeloEmail(emailLogin);
         if (foundUser != null) {
-            usuario = foundUser;
+            usuario = foundUser; // Atualiza o objeto usuario com o encontrado
         } else {
+            usuario = new Usuario(); // Limpa os dados se não encontrar
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Usuário não encontrado", "Nenhum usuário encontrado com este e-mail."));
         }
+    }
+
+    // Preparar a busca
+    public void prepararBusca() {
+        this.emailLogin = ""; // Limpa o campo de e-mail
+        this.usuario = new Usuario(); // Limpa o objeto usuário
+        this.usuario.setNome("");
     }
 
     // Carregar dados do usuário para atualização
@@ -98,6 +102,7 @@ public class UsuarioBean implements Serializable {
         Usuario usuario = buscarUsuarioPeloEmail(emailLogin);
         if (usuario != null && usuario.getSenha().equals(senhaLogin)) {
             loggedIn = true;
+            carregarUsuarioParaAtualizar(); // Carrega os dados do usuário logado
             return "home?faces-redirect=true"; // Redireciona para a página inicial após login bem-sucedido
         } else {
             loggedIn = false;

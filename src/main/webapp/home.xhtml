@@ -2,9 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets">
 <h:head>
    <title>Home</title>
+   <style>
+      .button-container {
+         display: flex;
+         gap: 2px; /* Espaço entre os botões */
+      }
+   </style>
 </h:head>
 <h:body>
    <div class="card">
@@ -12,14 +18,16 @@
          <p:growl id="messages" autoUpdate="true"/>
 
          <p:menubar hideDelay="1000">
-            <f:facet name="start">
-               <p:graphicImage name="images/primefaces-logo.svg" library="showcase" />
-            </f:facet>
 
             <p:submenu label="Users" icon="pi pi-fw pi-user">
                <p:menuitem value="Remover" icon="pi pi-fw pi-user-minus" onclick="PF('dlgRemover').show();" type="button"/>
                <p:menuitem value="Atualizar" icon="pi pi-fw pi-user-edit" onclick="PF('dlgAtualizar').show();" type="button"/>
                <p:menuitem value="Buscar" icon="pi pi-fw pi-search" onclick="PF('dlgBuscar').show();" type="button"/>
+            </p:submenu>
+
+            <p:submenu label="Evento" icon="pi pi-fw pi-calendar">
+               <p:menuitem value="Cadastrar" icon="pi pi-fw pi-plus" onclick="PF('dlgCadastrarEvento').show();" type="button"/>
+               <p:menuitem value="Buscar" icon="pi pi-fw pi-search" onclick="PF('dlgBuscarEvento').show();" type="button"/>
             </p:submenu>
 
             <p:divider layout="vertical"/>
@@ -52,29 +60,28 @@
    </p:confirmDialog>
 
    <!-- Modal de Atualizar Usuário -->
-   <p:dialog header="Atualizar Usuário" widgetVar="dlgAtualizar" modal="true" closable="true" resizable="false"
-             onShow="PF('atualizarForm').reset(); PF('dlgAtualizar').load();"
-             onLoad="PF('dlgAtualizar').load();">
+   <p:dialog header="Atualizar Usuário" widgetVar="dlgAtualizar" modal="true" closable="true" resizable="false">
       <h:form id="atualizarForm">
          <p:messages id="atualizarMessages" showDetail="true" autoUpdate="true" />
          <h:panelGrid columns="2">
             <h:outputLabel for="emailAtualizar" value="Email: " />
-            <p:inputText id="emailAtualizar" value="#{usuarioBean.usuario.email}" required="true" requiredMessage="Digite o email." disabled="true" />
+            <p:inputText id="emailAtualizar" value="#{usuarioBean.usuario.email}" required="true" requiredMessage="Digite o email." />
 
             <h:outputLabel for="nomeAtualizar" value="Nome: " />
             <p:inputText id="nomeAtualizar" value="#{usuarioBean.usuario.nome}" required="true" requiredMessage="Digite o nome." />
 
             <h:outputLabel for="senhaAtualizar" value="Senha: " />
-            <p:password id="senhaAtualizar" value="#{usuarioBean.usuario.senha}" required="true" requiredMessage="Digite a senha." />
+            <p:password id="senhaAtualizar" value="#{usuarioBean.usuario.senha}" />
 
             <h:outputLabel />
-            <p:commandButton value="Atualizar" action="#{usuarioBean.atualizarUsuario()}" update=":menuForm:messages, :atualizarForm:atualizarMessages" oncomplete="PF('dlgAtualizar').hide();"/>
+            <p:commandButton value="Atualizar" action="#{usuarioBean.atualizarUsuario()}" update=":menuForm:messages, :atualizarForm:atualizarMessages" oncomplete="PF('dlgAtualizar').hide();" />
          </h:panelGrid>
       </h:form>
    </p:dialog>
 
+
    <!-- Modal de Buscar Usuário -->
-   <p:dialog header="Buscar Usuário" widgetVar="dlgBuscar" modal="true" closable="true" resizable="false">
+   <p:dialog header="Buscar Usuário" widgetVar="dlgBuscar" modal="true" closable="true" resizable="false" onShow="PF('dlgBuscar').jq.find('input:text').val(''); PF('dlgBuscar').jq.find('span.ui-outputtext').text('');">
       <h:form id="buscarForm">
          <p:messages id="buscarMessages" showDetail="true" autoUpdate="true" />
          <h:panelGrid columns="2">
@@ -87,9 +94,87 @@
 
          <h:panelGrid columns="2" cellpadding="5">
             <h:outputLabel value="Nome: " />
-            <h:outputText value="#{usuarioBean.usuario.nome}" />
+            <h:outputText id="nomeBuscar" value="#{usuarioBean.usuario.nome}" />
          </h:panelGrid>
       </h:form>
    </p:dialog>
+
+   <!-- Diálogo de Cadastrar Evento -->
+   <p:dialog header="Cadastrar Evento" widgetVar="dlgCadastrarEvento" modal="true" closable="true" resizable="false">
+      <h:form id="cadastrarEventoForm">
+         <p:messages id="cadastrarEventoMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="nomeEventoCadastrar" value="Nome: " />
+            <p:inputText id="nomeEventoCadastrar" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
+
+            <h:outputLabel for="dataEventoCadastrar" value="Data: " />
+            <p:calendar id="dataEventoCadastrar" value="#{eventoBean.evento.data}" required="true" requiredMessage="Digite a data do evento." />
+
+            <h:outputLabel />
+            <p:commandButton value="Cadastrar" action="#{eventoBean.cadastrarEvento()}" update=":menuForm:messages, :cadastrarEventoForm:cadastrarEventoMessages, :eventosForm:eventosPanel" oncomplete="PF('dlgCadastrarEvento').hide();" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
+   <!-- Diálogo de Remover Evento -->
+   <p:dialog header="Remover Evento" widgetVar="dlgRemoverEvento" modal="true" closable="true" resizable="false">
+      <h:form id="removerEventoForm">
+         <p:messages id="removerEventoMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="nomeEventoRemover" value="Nome: " />
+            <p:inputText id="nomeEventoRemover" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
+
+            <h:outputLabel />
+            <p:commandButton value="Remover" action="#{eventoBean.removerEvento()}" update=":menuForm:messages, :removerEventoForm:removerEventoMessages" oncomplete="PF('dlgRemoverEvento').hide();" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
+   <!-- Diálogo de Atualizar Evento -->
+   <p:dialog header="Atualizar Evento" widgetVar="dlgAtualizarEvento" modal="true" closable="true" resizable="false">
+      <h:form id="atualizarEventoForm">
+         <p:messages id="atualizarEventoMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="nomeEventoAtualizar" value="Nome: " />
+            <p:inputText id="nomeEventoAtualizar" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
+
+            <h:outputLabel for="dataEventoAtualizar" value="Data: " />
+            <p:calendar id="dataEventoAtualizar" value="#{eventoBean.evento.data}" required="true" requiredMessage="Digite a data do evento." />
+
+            <h:outputLabel />
+            <p:commandButton value="Atualizar" action="#{eventoBean.atualizarEvento()}" update=":menuForm:messages, :atualizarEventoForm:atualizarEventoMessages" oncomplete="PF('dlgAtualizarEvento').hide();" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
+   <!-- Diálogo de Buscar Evento -->
+   <p:dialog header="Buscar Evento" widgetVar="dlgBuscarEvento" modal="true" closable="true" resizable="false">
+      <h:form id="buscarEventoForm">
+         <p:messages id="buscarEventoMessages" showDetail="true" autoUpdate="true" />
+         <h:panelGrid columns="2">
+            <h:outputLabel for="nomeEventoBuscar" value="Nome: " />
+            <p:inputText id="nomeEventoBuscar" value="#{eventoBean.evento.nome}" required="true" requiredMessage="Digite o nome do evento." />
+
+            <h:outputLabel />
+            <p:commandButton value="Buscar" action="#{eventoBean.buscarEvento()}" update=":menuForm:messages, :buscarEventoForm:buscarEventoMessages, :eventosForm:eventosPanel" oncomplete="PF('dlgBuscarEvento').hide();" />
+         </h:panelGrid>
+      </h:form>
+   </p:dialog>
+
+   <!-- Lista de Eventos -->
+   <h:form id="eventosForm">
+      <p:dataTable id="eventosPanel" value="#{eventoBean.eventos}" var="e" rowKey="#{e.nome}" widgetVar="eventosTable">
+         <p:column headerText="Evento">
+            <h:outputText value="#{e.nome}" />
+         </p:column>
+         <p:column headerText="Data">
+            <h:outputText value="#{e.data}" />
+         </p:column>
+         <p:column>
+            <p:commandButton value="Atualizar" icon="pi pi-pencil" actionListener="#{eventoBean.prepararAtualizacao(e)}" update=":menuForm:messages, :atualizarEventoForm" oncomplete="PF('dlgAtualizarEvento').show();" />
+            <p:commandButton value="Remover" icon="pi pi-minus" actionListener="#{eventoBean.prepararRemocao(e)}" update=":menuForm:messages, :removerEventoForm" oncomplete="PF('dlgRemoverEvento').show();" />
+         </p:column>
+      </p:dataTable>
+   </h:form>
 </h:body>
 </html>
